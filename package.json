@@ -1,6 +1,8 @@
 {
   "name": "dao-front-v0.0",
   "version": "0.1.0",
+  "author": "Henri-Michel LEOCADIE",
+  "license": "MIT",
   "private": true,
   "dependencies": {
     "@chakra-ui/core": "^1.0.0-rc.8",
