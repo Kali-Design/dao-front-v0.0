@@ -1,7 +1,7 @@
 import { Box } from "@chakra-ui/react";
-// import { useEffect } from "react";
-// import { useDaoFactory } from "../hooks/useDaoFactory";
-// import DashboardCompany from "./DashboardCompany"
+import { useEffect } from "react";
+import { useDaoFactory } from "../hooks/useDaoFactory";
+import DashboardCompany from "./DashboardCompany"
 
 const CompanyList = () => {
   const [daoFactory, daoFactoryState, daoFactoryDispatch] = useDaoFactory()
