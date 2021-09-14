@@ -1,7 +1,7 @@
 import { Box, Button, Input, Stack, Text } from "@chakra-ui/react";
 // import { ethers } from "ethers";
 import { useContext } from "react";
-// import { Web3Context } from "web3-hooks";
+import { Web3Context } from "web3-hooks";
 import { useDao } from "../hooks/useDao";
 import Governance from "./Governance"
 // import Management from "./Management"

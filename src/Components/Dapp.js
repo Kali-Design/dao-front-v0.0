@@ -1,9 +1,9 @@
 // import CreateCompany from "./CreateCompany"
 import CompanyList from "./CompanyList"
 import { Box, Button, Text } from "@chakra-ui/react";
-// import ContractsContextProvider from "../context/ContractsContext";
+import ContractsContextProvider from "../context/ContractsContext";
 import { useContext } from "react";
-// import { Web3Context } from "web3-hooks";
+import { Web3Context } from "web3-hooks";
 
 const Dapp = () => {
   const [web3State, login] = useContext(Web3Context)
