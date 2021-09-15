@@ -1,6 +1,6 @@
 import { Box, Button, Input, Stack, Text } from "@chakra-ui/react";
 import { useEffect } from "react";
-// import { useManagement } from "../hooks/useManagement";
+import { useManagement } from "../hooks/useManagement";
 import Employee from "./Employee"
 
 const Management = () => {

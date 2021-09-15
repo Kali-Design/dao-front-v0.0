@@ -3,7 +3,7 @@ import { Box, Button, Input, Stack, Text } from "@chakra-ui/react";
 import { useContext, useEffect } from "react";
  import { Web3Context } from "web3-hooks";
 import { useGovernance } from "../hooks/useGovernance";
-// import Proposal from "./Proposal";
+ import Proposal from "./Proposal";
 
 const Governance = () => {
   const [web3State] = useContext(Web3Context)

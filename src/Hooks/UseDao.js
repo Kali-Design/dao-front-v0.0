@@ -1,6 +1,6 @@
 import { useContext, useReducer } from "react"
 import ContractsContext from "../context/ContractsContext"
-// import { daoReducer } from "../reducers/daoReducer"
+import { daoReducer } from "../reducers/daoReducer"
 
 export const useDao = () => {
   const [dao] = useContext(ContractsContext)

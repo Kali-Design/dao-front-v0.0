@@ -1,5 +1,5 @@
 import { createContext } from "react";
-// import { useContract } from "web3-hooks";
+ import { useContract } from "web3-hooks";
 // import { daoFactoryAbi, daoFactoryAddress } from "../contracts/DaoFactoryAbi";
 // import { daoAbi } from "../contracts/DaoAbi";
 // import { governanceAbi } from "../contracts/GovernanceAbi";
