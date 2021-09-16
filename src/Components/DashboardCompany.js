@@ -4,8 +4,8 @@ import { useContext } from "react";
 import { Web3Context } from "web3-hooks";
 import { useDao } from "../hooks/useDao";
 import Governance from "./Governance"
-// import Management from "./Management"
-// import Treasury from "./Treasury"
+import Management from "./Management"
+import Treasury from "./Treasury"
 
 const DashboardCompany = ({ id, data }) => {
   const [web3State] = useContext(Web3Context)

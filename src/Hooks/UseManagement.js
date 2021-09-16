@@ -1,6 +1,6 @@
 import { useContext, useReducer } from "react"
 import ContractsContext from "../context/ContractsContext"
-// import { managementReducer } from "../reducers/managementReducer"
+import { managementReducer } from "../reducers/managementReducer"
 
 export const useManagement = () => {
   const [management] = useContext(ContractsContext)
