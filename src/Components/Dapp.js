@@ -1,4 +1,4 @@
-// import CreateCompany from "./CreateCompany"
+import CreateCompany from "./CreateCompany"
 import CompanyList from "./CompanyList"
 import { Box, Button, Text } from "@chakra-ui/react";
 import ContractsContextProvider from "../context/ContractsContext";
