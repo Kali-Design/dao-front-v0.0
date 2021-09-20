@@ -1,5 +1,5 @@
 import { Box, Button, Input, Stack, Text } from "@chakra-ui/react";
-// import { ethers } from "ethers";
+import { ethers } from "ethers";
 import { useContext, useEffect } from "react";
 import { Web3Context } from "web3-hooks";
 import { useGovernance } from "../hooks/useGovernance";
