@@ -1,3 +1,4 @@
+export const daoAbi_address = '0xEE972563C6ebaF95761f62a5a9AFa72d825dDD5d';
 export const daoAbi = [
     {
       "inputs": [
