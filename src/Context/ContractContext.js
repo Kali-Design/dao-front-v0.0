@@ -9,12 +9,12 @@ import { daoAbi } from "../contracts/DaoAbi";
 export const ContractsContext = createContext(null);
 
 const ContractsContextProvider = ({ children }) => {
-  let daoAddress, governanceAddress, managementAddress, treasuryAddress
-  const daoFactory = useContract(daoFactoryAddress, daoFactoryAbi)
-  const dao = useContract(daoAddress, daoAbi)
-  //const governance = useContract(governanceAddress, governanceAbi)
-  //const management = useContract(managementAddress, managementAbi)
-  //const treasury = useContract(treasuryAddress, treasuryAbi)
+  let daoAbi_address, daoFactory_address, governance_address, management_address, treasury_address
+  const daoFactory = useContract(daoFactory_address, daoFactoryAbi)
+  const dao = useContract(daoAbi_address, daoAbi)
+  //const governance = useContract(governance_address, governanceAbi)
+  //const management = useContract(management_address, managementAbi)
+  //const treasury = useContract(treasury_address, treasuryAbi)
 
   return (
     <ContractsContext.Provider value={[daoFactory, dao, /*governance, management, treasury*/]}>
