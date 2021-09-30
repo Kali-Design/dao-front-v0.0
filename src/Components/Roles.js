@@ -1,6 +1,6 @@
 import { Box, Button, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, Select, Stack, Switch, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
-// import { useDao } from "../hooks/useDao";
+import { useDao } from "../hooks/useDao";
 
 const Roles = () => {
   const [dao, daoState, daoDispatch] = useDao()
