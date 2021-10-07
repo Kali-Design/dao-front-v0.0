@@ -1,64 +1,86 @@
-import { Box, Button, Input, Stack, Text } from "@chakra-ui/react";
+import { Box, Button, FormControl, FormLabel, Input, InputGroup, InputLeftAddon, InputRightAddon, Select, Stack, Switch, Text } from "@chakra-ui/react";
 import { ethers } from "ethers";
 import { useContext, useEffect } from "react";
 import { Web3Context } from "web3-hooks";
 import { useGovernance } from "../hooks/useGovernance";
 import Proposal from "./Proposal";
 
-const Governance = () => {
+const Governance = ({ contractAddress }) => {
   const [web3State] = useContext(Web3Context)
   const [governance, governanceState, governanceDispatch] = useGovernance()
   const { token_data, send_account, send_amount, lock_amount, description, account, role, grant, proposals_id, proposals_data } = governanceState
 
   const handleChangeSendAccount = (e) => {
-    governanceDispatch({ type: "CHANGE_SEND_ACCOUNT", payload: e.target.event })
+    governanceDispatch({ type: "CHANGE_SEND_ACCOUNT", payload: e.target.value })
   }
   const handleChangeSendAmount = (e) => {
-    governanceDispatch({ type: "CHANGE_SEND_AMOUNT", payload: e.target.event })
+    governanceDispatch({ type: "CHANGE_SEND_AMOUNT", payload: e.target.value })
   }
   const handleChangeLockAmount = (e) => {
-    governanceDispatch({ type: "CHANGE_LOCK_AMOUNT", payload: e.target.event })
+    governanceDispatch({ type: "CHANGE_LOCK_AMOUNT", payload: e.target.value })
   }
   const handleChangeDescription = (e) => {
-    governanceDispatch({ type: "CHANGE_DESCRIPTION", payload: e.target.event })
+    governanceDispatch({ type: "CHANGE_DESCRIPTION", payload: e.target.value })
   }
   const handleChangeAccount = (e) => {
-    governanceDispatch({ type: "CHANGE_ACCOUNT", payload: e.target.event })
+    governanceDispatch({ type: "CHANGE_ACCOUNT", payload: e.target.value })
   }
   const handleChangeRole = (e) => {
-    governanceDispatch({ type: "CHANGE_ROLE", payload: e.target.event })
+    governanceDispatch({ type: "CHANGE_ROLE", payload: e.target.value })
   }
-  const handleChangeGrant = (e) => {
-    governanceDispatch({ type: "CHANGE_GRANT", payload: e.target.event })
+  const handleChangeGrant = () => {
+    governanceDispatch({ type: "CHANGE_GRANT", payload: !grant })
   }
   const handleClickSend = async () => {
-    await governance.transfer(send_account, send_amount)
+    const tx = await governance.transfer(send_account, ethers.utils.parseEther(send_amount))
+    await tx.wait()
+  }
+  const handleClickMint = async () => {
+    const tx = await governance.mint(send_account, ethers.utils.parseEther(send_amount))
+    await tx.wait()
+  }
+  const handleClickBurn = async () => {
+    const tx = await governance.burn(send_account, ethers.utils.parseEther(send_amount))
+    await tx.wait()
   }
   const handleCLickLock = async () => {
-    await governance.lock(lock_amount);
+    const tx = await governance.lock(ethers.utils.parseEther(lock_amount));
+    await tx.wait()
   }
   const handleCLickUnlock = async () => {
-    await governance.unlock(lock_amount)
+    const tx = await governance.unlock(ethers.utils.parseEther(lock_amount))
+    await tx.wait()
   }
   const handleClickPropose = async () => {
-    await governance.propose(description, account, ethers.utils.id(role), grant);
+    const tx = await governance.propose(description, account, ethers.utils.id(role), grant);
+    await tx.wait()
   }
 
   useEffect(() => {
-    let ids = []
-    let data = [{}]
-    let tokenData = {}
     async function getToken() {
-      tokenData = {
-        name: await governance.name(),
-        symbol: await governance.symbol(),
-        balance: await governance.balanceOf(web3State.account),
-        voting: await governance.votingPower(web3State.account),
+      try {
+        governanceDispatch({
+          type: "UPDATE_TOKEN_DATA", payload: {
+            name: await governance.name(),
+            symbol: await governance.symbol(),
+            balance: ethers.utils.formatEther((await governance.balanceOf(web3State.account)).toString()),
+            voting: ethers.utils.formatEther((await governance.votingPowerOf(web3State.account)).toString()),
+          }
+        })
+      } catch (e) {
+        console.log(e.message)
       }
     }
     async function getProposals() {
-      const id = await governance.nbProposal();
-      for (let i = 1; i <= id; i++) {
+      let ids = []
+      let data = [{}]
+      let id = 0
+      try {
+        id = await governance.nbProposal();
+      } catch (e) {
+        console.log(e.message)
+      }
+      for (let i = 1; i <= Number(id.toString()); i++) {
         ids.push(i)
         data.push({
           description: await governance.descriptionOf(i),
@@ -66,55 +88,96 @@ const Governance = () => {
           role: await governance.roleOf(i),
           grant: await governance.grantOf(i),
           author: await governance.authorOf(i),
-          nbYes: await governance.nbYes(i),
-          nbNo: await governance.nbNo(i),
-          createdAt: await governance.creationOf(i),
+          nbYes: ethers.utils.formatEther((await governance.nbYesOf(i)).toString()),
+          nbNo: ethers.utils.formatEther((await governance.nbNoOf(i)).toString()),
+          createdAt: Number((await governance.creationOf(i)).toString()),
           status: await governance.statusOf(i),
+          voteUsed: ethers.utils.formatEther((await governance.voteUsedOf(web3State.account, i)).toString()),
         })
       }
+      governanceDispatch({ type: "LIST_PROPOSALS", payload: ids })
+      governanceDispatch({ type: "UPDATE_PROPOSALS_DATA", payload: data })
     }
-    getProposals()
-    getToken()
-    governanceDispatch({ type: "LIST_PROPOSALS", payload: ids })
-    governanceDispatch({ type: "UPDATE_PROPOSALS_DATA", payload: data })
-    governanceDispatch({ type: "UPDATE_TOKEN_DATA", payload: tokenData })
+    if (governance || web3State.account) {
+      try {
+        getToken()
+        getProposals()
+      } catch (e) {
+        console.log(e.message)
+      }
+    }
   }, [governance, governanceDispatch, web3State.account])
-
-  return (
-    <Box>
-      <Text>Governance</Text>
+  return token_data !== [] ?
+    (<Box margin={5}>
+      <Text fontSize={30} align="center" margin={5}>Governance</Text>
       <Stack spacing={3}>
-        <Text>Personal information</Text>
-        <Text>Balance of {token_data.name}: {token_data.balance} {token_data.symbol}</Text>
-        <Text>Locked balance: {token_data.voting}</Text>
+        <Text>Contract address: {contractAddress}</Text>
+        <Stack spacing={3} padding={3} backgroundColor="gray.700">
+          <Text align="center">{token_data.name}</Text>
+          <Text>Your balance : {token_data.balance} {token_data.symbol}</Text>
+          <Text>Your locked balance : {token_data.voting} {token_data.symbol}</Text>
+        </Stack>
       </Stack>
-      <Stack spacing={3}>
-        <Input value={send_account} onChange={handleChangeSendAccount} placeholder="account" />
-        <Input value={send_amount} onChange={handleChangeSendAmount} placeholder="amount" />
-        <Button onClick={handleClickSend}>Send</Button>
+      <Text fontSize={20} align="center" margin={5}>ERC20 dashboard</Text>
+      <Stack spacing={3} margin={5}>
+        <InputGroup>
+          <InputLeftAddon children="Account :" />
+          <Input value={send_account} onChange={handleChangeSendAccount} placeholder="0x0" />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftAddon children="Ammount :" />
+          <Input value={send_amount} onChange={handleChangeSendAmount} placeholder="10" />
+          <InputRightAddon children={token_data.symbol} />
+        </InputGroup>
+        <Stack display="flex">
+          <Button onClick={handleClickSend}>Send</Button>
+          <Button onClick={handleClickMint}>Mint</Button>
+          <Button onClick={handleClickBurn}>Burn</Button>
+        </Stack>
       </Stack>
-      <Stack spacing={3}>
-        <Input value={lock_amount} onChange={handleChangeLockAmount} placeholder="amount" />
+      <Stack spacing={3} margin={5}>
+        <InputGroup>
+          <InputLeftAddon children="Lock amount :" />
+          <Input value={lock_amount} onChange={handleChangeLockAmount} placeholder="10" />
+          <InputRightAddon children={token_data.symbol} />
+        </InputGroup>
         <Button onClick={handleCLickLock}>Lock</Button>
         <Button onClick={handleCLickUnlock}>Unlock</Button>
       </Stack>
-      <Stack spacing={3}>
-        <Button>Mint</Button>
-        <Button>Burn</Button>
-      </Stack>
-      <Stack spacing={3}>
-        <Text>Submit a Role Proposal</Text>
-        <Input value={description} onChange={handleChangeDescription} />
-        <Input value={account} onChange={handleChangeAccount} />
-        <Input value={role} onChange={handleChangeRole} />
-        <Input value={grant} onChange={handleChangeGrant} />
+      <Text fontSize={20} align="center">Submit a Role Proposal</Text>
+      <Stack spacing={3} margin={5}>
+        <InputGroup>
+          <InputLeftAddon children="Description :" />
+          <Input value={description} onChange={handleChangeDescription} placeholder="Proposal for change role of a user" />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftAddon children="Account :" />
+          <Input value={account} onChange={handleChangeAccount} placeholder="0x0" />
+        </InputGroup>
+        <InputGroup>
+          <InputLeftAddon children="Role :" />
+          <Select value={role} onChange={handleChangeRole} placeholder="Select role" >
+            <option value="DEFAULT_ADMIN_ROLE">DEFAULT_ADMIN_ROLE</option>
+            <option value="ADMIN_ROLE">ADMIN_ROLE</option>
+            <option value="PROPOSER_ROLE">PROPOSER_ROLE</option>
+            <option value="MINTER_ROLE">MINTER_ROLE</option>
+            <option value="BURNER_ROLE">BURNER_ROLE</option>
+            <option value="MANAGER_ROLE">MANAGER_ROLE</option>
+            <option value="TREASURIER_ROLE">TREASURIER_ROLE</option>
+          </Select>
+        </InputGroup>
+        <FormControl display="flex" alignItems="center">
+          <FormLabel htmlFor="grant">Grant or Revoke ?</FormLabel>
+          <Switch id="grant" value={grant} onChange={handleChangeGrant} defaultChecked="true" />
+        </FormControl>
         <Button onClick={handleClickPropose}>Propose</Button>
       </Stack>
-      {proposals_id.map(el => {
-        return <Proposal governance={governance} id={el} data={proposals_data[el]} />
-      })}
-    </Box>
-  );
+      <Box>
+        {proposals_id.map(el => {
+          return <Proposal governance={governance} id={el} proposal={proposals_data[el]} key={el} />
+        })}
+      </Box>
+    </Box >) : <Text>Governance is loading</Text>
 };
 
 export default Governance;
