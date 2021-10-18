@@ -9,6 +9,28 @@
 
 - **Working progress**
 
+### Dependencies:
+
+- web3-hooks
+- ethers
+- chakra-ui
+- react-router-dom
+- react-simple-timestamp-to-date
+
+### Dapp structure
+
+```
+Dapp
+├── DaoFactory
+├── DaoList
+├── Dao
+│   ├── ContractsLayout
+│   │   ├── Governance ── Proposal
+│   │   ├── Management ── Employee
+│   │   └── Treasury ── Charge
+│   └── Roles
+```
+
 ## Auteur
 
 - **Henri-Michel LEOCADIE** _alias_ [Kali-Design](https://github.com/kali-Design)
